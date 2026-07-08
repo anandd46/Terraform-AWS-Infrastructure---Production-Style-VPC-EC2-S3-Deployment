@@ -124,7 +124,8 @@ This project solves each problem above directly:
 
 The diagram below shows the complete architecture: a custom VPC spanning two Availability Zones, each with a public and private subnet, an Internet Gateway providing bidirectional access to the public tier, a NAT Gateway providing outbound-only access to the private tier, and a Bastion Host as the sole SSH entry point.
 
-![Overall AWS Architecture](./architecture.png)
+<img width="2880" height="1890" alt="architecture" src="https://github.com/user-attachments/assets/2c2bc08d-a900-4b83-8a28-323cf34131f7" />
+
 
 **Key components at a glance:**
 
@@ -148,7 +149,8 @@ The diagram below shows the complete architecture: a custom VPC spanning two Ava
 
 ## 🗺️ Complete Network Topology
 
-![VPC Topology](./vpc-topology.png)
+<img width="2700" height="1710" alt="vpc-topology" src="https://github.com/user-attachments/assets/1ea2079a-fa36-4f8b-9aa3-d5f2aadfc8f0" />
+
 
 The VPC (`10.0.0.0/16`) is divided into four subnets, two per Availability Zone, following a consistent, memorable numbering convention: public subnets use the `.1.x`/`.2.x` ranges, private subnets use the `.11.x`/`.12.x` ranges. This convention makes it immediately obvious from an IP address alone which tier and which AZ a resource belongs to — a small detail that pays off enormously during incident response.
 
@@ -258,7 +260,8 @@ echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
 For the absolute cheapest and most locked-down configuration, you can set `enable_nat_gateway = false` and `enable_nat_instance = false`. Private instances will then have **zero internet access** — appropriate for workloads that only need to talk to other resources inside the VPC or via VPC Endpoints (e.g., to S3), never to the open internet.
 
-![Routing Diagram](./routing-diagram.png)
+<img width="2700" height="1710" alt="routing-diagram" src="https://github.com/user-attachments/assets/e36ad866-cac1-46c9-8a63-f03fecff6b25" />
+
 
 ---
 
@@ -301,7 +304,8 @@ An Elastic IP (EIP) is a static, public IPv4 address you own for as long as you 
 
 Security Groups are **stateful** virtual firewalls attached at the instance (ENI) level. "Stateful" means that if inbound traffic is allowed on a port, the corresponding outbound response is automatically permitted — you don't need a matching outbound rule for replies.
 
-![Security Group Diagram](./security-group-diagram.png)
+<img width="2700" height="1710" alt="security-group-diagram" src="https://github.com/user-attachments/assets/fd4e604b-9eb7-4377-b010-a9999624ae11" />
+
 
 | Security Group | Inbound Rules | Outbound Rules | Attached To |
 |---|---|---|---|
@@ -343,7 +347,8 @@ Network ACLs (NACLs) are **stateless**, subnet-level firewalls evaluated in rule
 
 ## 🔁 Traffic Flow
 
-![Network Flow Diagram](./network-flow.png)
+<img width="2700" height="1620" alt="network-flow" src="https://github.com/user-attachments/assets/5cdbc9a3-584b-45d2-a254-4fe09b0e725e" />
+
 
 ### SSH Flow (Administrative Access)
 
