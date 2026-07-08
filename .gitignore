@@ -1,0 +1,50 @@
+# ==========================================
+# Terraform
+# ==========================================
+**/.terraform/*
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Sensitive variable files (copy from terraform.tfvars.example)
+terraform.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Plan output files
+*.tfplan
+tfplan*
+
+# ==========================================
+# AWS / SSH
+# ==========================================
+*.pem
+*.ppk
+*.key
+.aws/
+aws-credentials.txt
+
+# ==========================================
+# OS / Editor files
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# ==========================================
+# Logs
+# ==========================================
+*.log
