@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 ############################################################################
 # terraform.tf
 # Main infrastructure definition for Production-Style AWS VPC Architecture
