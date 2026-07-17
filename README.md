@@ -198,47 +198,47 @@ The primary goals of this project are:
 
 ```mermaid
 graph TB
-    subgraph Internet["🌐 Internet"]
-        USER[👤 User / Browser]
-        ADMIN[🔧 Admin / Terraform]
+    subgraph Internet["Internet"]
+        USER[User / Browser]
+        ADMIN[Admin / Terraform]
     end
 
-    subgraph AWS["☁️ AWS Cloud — us-east-1"]
-        subgraph VPC["🔷 VPC: 10.0.0.0/16"]
-            IGW[🚀 Internet Gateway]
+    subgraph AWS["AWS Cloud - us-east-1"]
+        subgraph VPC["VPC: 10.0.0.0/16"]
+            IGW[Internet Gateway]
 
-            subgraph PublicSubnet["🟢 Public Subnet: 10.0.1.0/24 — us-east-1a"]
-                NACL[🛡️ Network ACL]
-                SG[🔒 Security Group]
-                EC2[🖥️ EC2 Instance\nt3.micro — Amazon Linux 2023]
-                EIP[📍 Elastic IP]
+            subgraph PublicSubnet["Public Subnet: 10.0.1.0/24 - us-east-1a"]
+                NACL[Network ACL]
+                SG[Security Group]
+                EC2[EC2 Instance - t3.micro - Amazon Linux 2023]
+                EIP[Elastic IP]
             end
         end
 
-        subgraph IAM["🔐 IAM"]
+        subgraph IAM["IAM"]
             ROLE[IAM Role]
             POLICY[Custom IAM Policy]
             PROFILE[Instance Profile]
             USER_IAM[IAM User]
         end
 
-        subgraph S3["🪣 S3"]
-            BUCKET[S3 Bucket\nVersioning + Encryption + HTTPS-only]
+        subgraph S3["S3"]
+            BUCKET[S3 Bucket - Versioning + Encryption + HTTPS-only]
         end
 
-        subgraph CW["📊 CloudWatch"]
-            LOGGROUP[Log Group\n/aws/aws-infra/production/application]
-            METRICS[Custom Metrics\nCPU · Memory · Disk · Network]
+        subgraph CW["CloudWatch"]
+            LOGGROUP[Log Group]
+            METRICS[Custom Metrics - CPU / Memory / Disk / Network]
         end
     end
 
     USER -->|HTTP :80| EIP
     ADMIN -->|SSH :22| EIP
-    ADMIN -->|terraform apply| TERRAFORM[⚙️ Terraform CLI]
+    ADMIN -->|terraform apply| TERRAFORM[Terraform CLI]
     TERRAFORM -->|provisions| VPC
     EIP --- EC2
     EC2 --- SG --- NACL --- IGW
-    IGW <-->|0.0.0.0/0| Internet
+    IGW -->|0.0.0.0/0| Internet
     EC2 -->|assumes| PROFILE --> ROLE --> POLICY
     EC2 -->|writes logs| LOGGROUP
     EC2 -->|publishes metrics| METRICS
@@ -257,66 +257,66 @@ graph TB
 
 ```mermaid
 flowchart TD
-    A[🚀 terraform apply] --> B[Create VPC\n10.0.0.0/16]
+    A[terraform apply] --> B[Create VPC - 10.0.0.0/16]
     B --> C[Attach Internet Gateway]
-    C --> D[Create Public Subnet\n10.0.1.0/24]
-    D --> E[Create Route Table\n0.0.0.0/0 → IGW]
-    E --> F[Associate Route Table\nwith Public Subnet]
-    F --> G[Create Network ACL\nStateless Rules]
-    G --> H[Create Security Group\nStateful Rules]
+    C --> D[Create Public Subnet - 10.0.1.0/24]
+    D --> E[Create Route Table - 0.0.0.0/0 to IGW]
+    E --> F[Associate Route Table with Public Subnet]
+    F --> G[Create Network ACL - Stateless Rules]
+    G --> H[Create Security Group - Stateful Rules]
 
-    B --> I[Generate TLS Private Key\nRSA 4096-bit]
-    I --> J[Upload AWS Key Pair\nPublic Key → EC2]
+    B --> I[Generate TLS Private Key - RSA 4096-bit]
+    I --> J[Upload AWS Key Pair - Public Key to EC2]
 
-    B --> K[Create IAM Role\nEC2 Trust Policy]
-    K --> L[Create Custom IAM Policy\nLeast Privilege]
+    B --> K[Create IAM Role - EC2 Trust Policy]
+    K --> L[Create Custom IAM Policy - Least Privilege]
     L --> M[Attach Policy to Role]
     K --> N[Create Instance Profile]
 
-    B --> O[Create CloudWatch Log Group\n30-day Retention]
+    B --> O[Create CloudWatch Log Group - 30-day Retention]
 
-    B --> P[Create S3 Bucket\nRandom Suffix]
+    B --> P[Create S3 Bucket - Random Suffix]
     P --> Q[Enable Versioning]
     P --> R[Enable AES-256 Encryption]
     P --> S[Block Public Access]
     P --> T[Apply Lifecycle Rules]
     P --> U[Attach HTTPS-only Policy]
 
-    H --> V[Launch EC2 Instance\nt3.micro — AL2023 — gp3 encrypted]
+    H --> V[Launch EC2 Instance - t3.micro - AL2023 - gp3 encrypted]
     J --> V
     N --> V
     O --> V
 
-    V --> W[Run userdata.sh\nApache + CloudWatch Agent]
+    V --> W[Run userdata.sh - Apache + CloudWatch Agent]
     V --> X[Attach Elastic IP]
 
-    W --> Y[✅ Deployment Complete\nhttp://EIP visible]
+    W --> Y[Deployment Complete - http://EIP visible]
 ```
 
 ### Networking Diagram
 
 ```mermaid
 graph LR
-    subgraph Internet["🌐 Public Internet"]
+    subgraph Internet["Public Internet"]
         CLIENT[HTTP/SSH Client]
     end
 
     subgraph AWS_Network["AWS Network"]
-        IGW["Internet Gateway\n(aws-infra-production-igw)"]
+        IGW[Internet Gateway - aws-infra-production-igw]
 
         subgraph VPC["VPC: 10.0.0.0/16"]
-            RT["Route Table\n0.0.0.0/0 → IGW\n10.0.0.0/16 → local"]
+            RT[Route Table - 0.0.0.0/0 to IGW - 10.0.0.0/16 local]
 
             subgraph PublicSubnet["Public Subnet: 10.0.1.0/24"]
-                NACL["Network ACL (Stateless)\nIN: TCP 80,443,22,1024-65535\nOUT: All"]
-                SG["Security Group (Stateful)\nIN: 22,80,443,ICMP\nOUT: All"]
-                EC2["EC2 Instance\n10.0.1.x (private)\nEIP (public)"]
+                NACL[Network ACL - Stateless - IN: 80,443,22,1024-65535]
+                SG[Security Group - Stateful - IN: 22,80,443,ICMP]
+                EC2[EC2 Instance - 10.0.1.x private - EIP public]
             end
         end
     end
 
-    CLIENT -->|:80 HTTP| IGW
-    CLIENT -->|:22 SSH| IGW
+    CLIENT -->|":80 HTTP"| IGW
+    CLIENT -->|":22 SSH"| IGW
     IGW --> RT
     RT --> NACL
     NACL --> SG
@@ -328,11 +328,11 @@ graph LR
 
 ```mermaid
 sequenceDiagram
-    participant Dev as 👨‍💻 Developer
-    participant TF as ⚙️ Terraform CLI
-    participant S3 as 🪣 S3 Backend
-    participant DDB as 🗄️ DynamoDB
-    participant AWS as ☁️ AWS API
+    participant Dev as Developer
+    participant TF as Terraform CLI
+    participant S3 as S3 Backend
+    participant DDB as DynamoDB
+    participant AWS as AWS API
 
     Dev->>TF: terraform init
     TF->>S3: Download state file
@@ -362,14 +362,14 @@ sequenceDiagram
 
 ```mermaid
 graph TD
-    EC2["🖥️ EC2 Instance"]
-    PROFILE["IAM Instance Profile\naws-infra-production-ec2-profile"]
-    ROLE["IAM Role\naws-infra-production-ec2-role"]
-    TRUST["Trust Policy\nPrincipal: ec2.amazonaws.com\nAction: sts:AssumeRole"]
-    CUSTOM_POLICY["Custom IAM Policy\nCloudWatch Logs\nCloudWatch Metrics\nS3 (bucket-scoped)\nSSM Messages\nEC2 Describe"]
-    SSM_POLICY["AWS Managed Policy\nAmazonSSMManagedInstanceCore"]
-    STS["AWS STS\nTemporary Credentials"]
-    IMDS["EC2 Metadata Service\nIMDSv2 — Token-based"]
+    EC2[EC2 Instance]
+    PROFILE[IAM Instance Profile - aws-infra-production-ec2-profile]
+    ROLE[IAM Role - aws-infra-production-ec2-role]
+    TRUST[Trust Policy - Principal: ec2.amazonaws.com - Action: sts:AssumeRole]
+    CUSTOM_POLICY[Custom IAM Policy - CloudWatch Logs - S3 bucket-scoped - SSM - EC2 Describe]
+    SSM_POLICY[AWS Managed Policy - AmazonSSMManagedInstanceCore]
+    STS[AWS STS - Temporary Credentials]
+    IMDS[EC2 Metadata Service - IMDSv2 Token-based]
 
     EC2 -->|attached via| PROFILE
     PROFILE -->|wraps| ROLE
@@ -380,8 +380,8 @@ graph TD
     STS -->|issues creds via| IMDS
     IMDS -->|consumed by| EC2
 
-    USER["IAM User\nterraform-demo-user"]
-    LOGIN["Login Profile\nConsole Access\nPassword Reset Required"]
+    USER[IAM User - terraform-demo-user]
+    LOGIN[Login Profile - Console Access - Password Reset Required]
     USER --> LOGIN
 
     style EC2 fill:#fff3e0,stroke:#FF9800
@@ -429,24 +429,24 @@ graph TD
 
 ```mermaid
 flowchart LR
-    USER[👤 End User\nBrowser] -->|HTTP GET :80| EIP[📍 Elastic IP]
-    EIP --> IGW[🚀 Internet Gateway]
+    USER[End User - Browser] -->|HTTP GET :80| EIP[Elastic IP]
+    EIP --> IGW[Internet Gateway]
     IGW -->|Route: 0.0.0.0/0| RT[Route Table]
-    RT --> NACL{Network ACL\nStateless Check}
-    NACL -->|Rule 100: TCP 80 ALLOW| SG{Security Group\nStateful Check}
-    SG -->|Ingress: TCP 80 ALLOW| EC2[🖥️ EC2: Apache HTTPD :80]
+    RT --> NACL{Network ACL - Stateless}
+    NACL -->|Rule 100: TCP 80 ALLOW| SG{Security Group - Stateful}
+    SG -->|Ingress: TCP 80 ALLOW| EC2[EC2 - Apache HTTPD :80]
     EC2 -->|Response| SG
     SG -->|Stateful: response auto-allowed| NACL
-    NACL -->|Rule 100 Egress: ALL ALLOW| IGW
+    NACL -->|Egress: ALL ALLOW| IGW
     IGW --> EIP --> USER
 
-    ADMIN[🔧 Admin SSH] -->|TCP :22| EIP
+    ADMIN[Admin SSH] -->|TCP :22| EIP
     EIP --> IGW --> RT --> NACL
     NACL -->|Rule 120: TCP 22 ALLOW| SG
     SG -->|Ingress: TCP 22 ALLOW| EC2
 
-    EC2 -->|CloudWatch API HTTPS :443| CW[☁️ CloudWatch]
-    EC2 -->|S3 API HTTPS :443| S3[🪣 S3 Bucket]
+    EC2 -->|CloudWatch API HTTPS :443| CW[CloudWatch]
+    EC2 -->|S3 API HTTPS :443| S3[S3 Bucket]
 
     style USER fill:#e3f2fd,stroke:#2196F3
     style ADMIN fill:#fce4ec,stroke:#E91E63
